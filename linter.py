@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from SublimeLinter.lint import ComposerLinter, util
+from SublimeLinter.lint import PhpLinter, util
 
 
 def find_configuration_file(file_name):
@@ -17,7 +17,7 @@ def find_configuration_file(file_name):
     return None
 
 
-class PhpCsFixer(ComposerLinter):
+class PhpCsFixer(PhpLinter):
     """Provides an interface to php-cs-fixer."""
 
     defaults = {
