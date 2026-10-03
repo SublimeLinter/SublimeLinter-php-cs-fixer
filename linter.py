@@ -29,19 +29,23 @@ class PhpCsFixer(PhpLinter):
         r'[^-+]+[-+]?\s+[^\n]*'
     )
     multiline = True
-    tempfile_suffix = 'php'
     error_stream = util.STREAM_STDOUT
     line_col_base = (-2, 1)
 
     def cmd(self):
-        command = [
-            'php-cs-fixer',
-            'fix',
-            '${temp_file}',
-            '--dry-run',
+        if self.settings.get('version') == 2:
+            command = ['php-cs-fixer', 'fix', '--dry-run', '--diff-format=udiff']
+        else:
+            command = ['php-cs-fixer', 'check', '--diff']
+
+        command += [
+            # Never ask questions. Without a config file php-cs-fixer asks
+            # "Do you want to create the config file?", takes the default
+            # without a terminal, and writes .php-cs-fixer.dist.php and
+            # .gitignore next to the linted file.
+            '--no-interaction',
             '--show-progress=none',
             '--stop-on-violation',
-            '--diff-format=udiff' if self.settings.get('version') == 2 else '--diff',
             '--using-cache=no',
             '--no-ansi',
             '-vv'
@@ -50,5 +54,9 @@ class PhpCsFixer(PhpLinter):
         config_file = self.settings.get('config_file') or find_configuration_file(self.view.file_name())
         if config_file:
             command.append(f'--config={config_file}')
+
+        # Read the code from stdin. php-cs-fixer only looks for a config file
+        # from the current directory, which is why we pass `--config` above.
+        command.append('-')
 
         return command
