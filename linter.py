@@ -33,12 +33,10 @@ class PhpCsFixer(PhpLinter):
     line_col_base = (-2, 1)
 
     def cmd(self):
-        if self.settings.get('version') == 2:
-            command = ['php-cs-fixer', 'fix', '--dry-run', '--diff-format=udiff']
-        else:
-            command = ['php-cs-fixer', 'check', '--diff']
-
-        command += [
+        command = [
+            'php-cs-fixer',
+            'fix',
+            '--dry-run',
             # Never ask questions. Without a config file php-cs-fixer asks
             # "Do you want to create the config file?", takes the default
             # without a terminal, and writes .php-cs-fixer.dist.php and
@@ -46,6 +44,7 @@ class PhpCsFixer(PhpLinter):
             '--no-interaction',
             '--show-progress=none',
             '--stop-on-violation',
+            '--diff-format=udiff' if self.settings.get('version') == 2 else '--diff',
             '--using-cache=no',
             '--no-ansi',
             '-vv'
